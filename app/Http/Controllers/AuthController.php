@@ -61,4 +61,9 @@ class AuthController extends Controller
 
         return response()->json(['message'=>'Email verified.'], 200);
     }
+
+    public function show(): JsonResponse
+    {
+        return response()->json(['user' => auth()->user()]);
+    }
 }
