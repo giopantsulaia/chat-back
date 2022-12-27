@@ -45,7 +45,7 @@ class UserRegistered extends Notification
     {
         return (new MailMessage)
                     ->subject('Email Verification')
-                    ->markdown('emails.registered',['hash' => $this->user->id . hash('sha256',  $this->user->email)]);
+                    ->markdown('emails.registered',['hash' => $this->user->id . '|' . hash('sha256',  $this->user->email)]);
     }
 
     /**
