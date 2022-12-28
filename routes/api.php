@@ -20,5 +20,5 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/login','login')->name('login');
     Route::post('/logout','logout')->name('logout')->middleware('auth:sanctum');
     Route::post('/verify-email','verify')->name('email.verify');
-    Route::get('/me','show')->name('get.user_data')->middleware('auth:sanctum');
+    Route::get('/me','show')->name('get.user_data')->middleware('auth:sanctum','verified');
 });
