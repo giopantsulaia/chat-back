@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -65,5 +66,13 @@ class AuthController extends Controller
     public function show(): JsonResponse
     {
         return response()->json(['user' => auth()->user()]);
+    }
+
+    public function update(UpdateUserRequest $request) : JsonResponse
+    {
+        $user = auth('sanctum')->user();
+        $user->update($request->validated());
+
+        return response()->json(['message' => 'User updated successfully.']);
     }
 }
