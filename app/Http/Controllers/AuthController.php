@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use App\Notifications\NewEmailVerification;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +29,6 @@ class AuthController extends Controller
         $user = User::where('email', $validated['email'])->firstOrFail();
 
         if (!Auth::attempt($validated)) {
-
             return response()->json(['message' => 'Incorrect credentials.'], 401);
         }
 
@@ -37,7 +37,6 @@ class AuthController extends Controller
         }
 
         return response()->json(['token' => $user->createToken('api token')->plainTextToken,'expires_at' => time() + 3600]);
-
     }
 
     public function logout(): JsonResponse
@@ -53,14 +52,21 @@ class AuthController extends Controller
 
     public function verify(Request $request): JsonResponse
     {
-        $user = User::findOrFail((int)strtok($request->hash,'|'));
+        if ($request->email) {
+            $user = User::firstWhere('verification_code', $request->token);
+            $user->update(['email'=>$request->email,'email_verified_at' => now(), 'verification_code' => null]);
+            return response()->json(['message' => 'New email activated']);
+        } else {
+            $user = User::findOrFail((int)strtok($request->hash, '|'));
+            $correctUser = hash_equals((string) substr($request->hash, strpos($request->hash, "|") + 1), hash('sha256', $user->email));
 
-        if(!hash_equals((string) substr($request->hash, strpos($request->hash, "|") + 1),hash('sha256',$user->email))) {
-            throw new AuthorizationException();
+            if (!$correctUser) {
+                throw new AuthorizationException();
+            }
+            $user->markEmailAsVerified();
+
+            return response()->json(['message'=>'Email verified.'], 200);
         }
-        $user->markEmailAsVerified();
-
-        return response()->json(['message'=>'Email verified.'], 200);
     }
 
     public function show(): JsonResponse
@@ -68,10 +74,45 @@ class AuthController extends Controller
         return response()->json(['user' => auth()->user()]);
     }
 
-    public function update(UpdateUserRequest $request) : JsonResponse
+    public function update(UpdateUserRequest $request): JsonResponse
     {
         $user = auth('sanctum')->user();
-        $user->update($request->validated());
+
+        if ($request->image) {
+            $file = $request->file('image');
+            $file_name = time() . '.' . $file->getClientOriginalName();
+            $file->move(public_path('storage/avatars'), $file_name);
+            $user->update(['avatar' => 'storage/avatars/' . $file_name]);
+        }
+
+        if ($request->email) {
+            if (User::firstWhere('email', $request->email)) {
+                return response()->json(['message'=>'Email exists']);
+            }
+
+            $user->verification_code = sha1($user->id . $request->email . time());
+            $user->save();
+            $user->notify(new NewEmailVerification($user->verification_code, $request->email));
+        }
+
+        if ($request->first_name) {
+            $user->update(['first_name' => $request->validated()['first_name']]);
+        }
+        if ($request->last_name) {
+            $user->update(['last_name' => $request->validated()['last_name']]);
+        }
+        if ($request->about) {
+            $user->update(['about' => $request->validated()['about']]);
+        }
+        if ($request->phone) {
+            $user->update(['phone' => $request->validated()['phone']]);
+        }
+        if ($request->birth_date) {
+            $user->update(['birth_date' => $request->validated()['birth_date']]);
+        }
+        if ($request->gender) {
+            $user->update(['gender' => $request->validated()['gender']]);
+        }
 
         return response()->json(['message' => 'User updated successfully.']);
     }

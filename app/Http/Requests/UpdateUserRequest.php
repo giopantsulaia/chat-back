@@ -22,7 +22,8 @@ class UpdateUserRequest extends FormRequest
             'birth_date' => ['date'],
             'gender' => ['nullable','string','in:male,female,other'],
             'about' => ['nullable','string'],
-            'phone' => ['nullable']
+            'phone' => ['nullable'],
+            'image' => ['image']
         ];
     }
 }
