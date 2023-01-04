@@ -19,7 +19,6 @@ class UpdateUserRequest extends FormRequest
 			'email'      => ['email', 'unique:users,email'],
 			'birth_date' => ['date'],
 			'gender'     => ['nullable', 'string', 'in:male,female,other'],
-			'about'      => ['nullable', 'string'],
 			'phone'      => ['nullable'],
 			'image'      => ['image'],
 		];

@@ -60,6 +60,7 @@ class AuthController extends Controller
 		{
 			$user = User::firstWhere('verification_code', $request->token);
 			$user->update(['email'=>$request->email, 'email_verified_at' => now(), 'verification_code' => null]);
+
 			return response()->json(['message' => 'New email activated']);
 		}
 		else
@@ -113,10 +114,6 @@ class AuthController extends Controller
 		if ($request->last_name)
 		{
 			$user->update(['last_name' => $request->validated()['last_name']]);
-		}
-		if ($request->about)
-		{
-			$user->update(['about' => $request->validated()['about']]);
 		}
 		if ($request->phone)
 		{
