@@ -26,4 +26,5 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::controller(UserController::class)->group(function () {
 	Route::get('/users/{user}', 'show')->name('get.user')->middleware('auth:sanctum', 'verified');
+	Route::post('/search', 'search')->name('search.users')->middleware('auth:sanctum', 'verified');
 });

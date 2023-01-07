@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Staudenmeir\LaravelMergedRelations\Eloquent\HasMergedRelationships;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -17,6 +18,8 @@ class User extends Authenticatable implements MustVerifyEmail
 	use HasFactory;
 
 	use Notifiable;
+
+	use HasMergedRelationships;
 
 	/**
 	 * The attributes that are mass assignable.
@@ -57,5 +60,44 @@ class User extends Authenticatable implements MustVerifyEmail
 	public function setPasswordAttribute($password)
 	{
 		$this->attributes['password'] = bcrypt($password);
+	}
+
+	public function friendsTo()
+	{
+		return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
+			->withPivot('accepted')
+			->withTimestamps();
+	}
+
+	public function friendsFrom()
+	{
+		return $this->belongsToMany(User::class, 'friends', 'friend_id', 'user_id')
+			->withPivot('accepted')
+			->withTimestamps();
+	}
+
+	public function friendsPendingTo()
+	{
+		return $this->friendsTo()->wherePivot('accepted', false);
+	}
+
+	public function friendsPendingFrom()
+	{
+		return $this->friendsFrom()->wherePivot('accepted', false);
+	}
+
+	public function friendsAcceptedTo()
+	{
+		return $this->friendsTo()->wherePivot('accepted', true);
+	}
+
+	public function friendsAcceptedFrom()
+	{
+		return $this->friendsFrom()->wherePivot('accepted', true);
+	}
+
+	public function friends()
+	{
+		return $this->mergedRelationWithModel(User::class, 'friends_view');
 	}
 }
