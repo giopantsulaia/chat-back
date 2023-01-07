@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,4 +28,8 @@ Route::controller(AuthController::class)->group(function () {
 Route::controller(UserController::class)->group(function () {
 	Route::get('/users/{user}', 'show')->name('get.user')->middleware('auth:sanctum', 'verified');
 	Route::post('/search', 'search')->name('search.users')->middleware('auth:sanctum', 'verified');
+});
+
+Route::controller(FriendController::class)->group(function () {
+	Route::post('/friend-request', 'send')->name('send.friend_request')->middleware('auth:sanctum', 'verified');
 });
