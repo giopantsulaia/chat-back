@@ -20,7 +20,7 @@ class UserController extends Controller
 		}
 		elseif ($isFriend)
 		{
-			$friendship = true;
+			$friendship = 'friends';
 		}
 
 		return response()->json(['user' => $user, 'friend' => $friendship], 200);
