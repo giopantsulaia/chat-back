@@ -19,9 +19,29 @@ class FriendController extends Controller
 
 	public function destroy(FriendRequest $request): JsonResponse
 	{
-		$friendsTo = User::find($request->friend_id);
+		$friend = User::find($request->friend_id);
 
-		auth('sanctum')->user()->friendsTo()->detach($friendsTo);
+		try
+		{
+			$user = auth('sanctum')->user();
+
+			$user->friendsTo()->detach($friend);
+
+			$user->friendsFrom()->detach($friend);
+
+			return response()->json(['message'=> 'Friend removed successfully.']);
+		}
+		catch(\Exception $e)
+		{
+			return response()->json(['message' => $e->getMessage()]);
+		}
+	}
+
+	public function accept(FriendRequest $request): JsonResponse
+	{
+		$requestFrom = $request->user_id;
+
+		auth('sanctum')->user()->friendsPendingFrom()->firstWhere('user_id', $requestFrom)->pivot->update(['accepted' => 1]);
 
 		return response()->json(['message'=> 'Friend removed successfully.']);
 	}

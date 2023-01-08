@@ -33,4 +33,5 @@ Route::controller(UserController::class)->group(function () {
 Route::controller(FriendController::class)->group(function () {
 	Route::post('/friend-request', 'send')->name('send.friend_request')->middleware('auth:sanctum', 'verified');
 	Route::post('/remove-friend', 'destroy')->name('remove.friend')->middleware('auth:sanctum', 'verified');
+	Route::post('/accept-friend', 'accept')->name('accept.friend')->middleware('auth:sanctum', 'verified');
 });

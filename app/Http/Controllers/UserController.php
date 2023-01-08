@@ -10,13 +10,19 @@ class UserController extends Controller
 {
 	public function show(User $user): JsonResponse
 	{
+		$authUser = auth('sanctum')->user();
 		$friendship = null;
-		$pending = auth('sanctum')->user()->friendsPendingTo()->where('friend_id', $user->id)->first();
-		$isFriend = auth('sanctum')->user()->friends()->where('id', $user->id)->first();
+		$pending = $authUser->friendsPendingTo()->firstWhere('friend_id', $user->id);
+		$isFriend = $authUser->friends()->firstWhere('id', $user->id);
+		$incoming = $authUser->friendsPendingFrom()->firstWhere('user_id', $user->id);
 
 		if ($pending)
 		{
 			$friendship = 'pending';
+		}
+		elseif ($incoming)
+		{
+			$friendship = 'incoming';
 		}
 		elseif ($isFriend)
 		{
