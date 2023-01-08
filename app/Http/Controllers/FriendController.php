@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FriendRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class FriendController extends Controller
 {
@@ -44,5 +46,23 @@ class FriendController extends Controller
 		auth('sanctum')->user()->friendsPendingFrom()->firstWhere('user_id', $requestFrom)->pivot->update(['accepted' => 1]);
 
 		return response()->json(['message'=> 'Friend removed successfully.']);
+	}
+
+	public function getMyFriends(): JsonResponse
+	{
+		$user = auth('sanctum')->user();
+
+		$friends = $user->friends;
+
+		return response()->json(['friends' => UserResource::collection($friends)]);
+	}
+
+	public function getUserFriends(Request $request): JsonResponse
+	{
+		$user = User::find($request->id);
+
+		$friends = $user->friends;
+
+		return response()->json(['friends' => UserResource::collection($friends)]);
 	}
 }
