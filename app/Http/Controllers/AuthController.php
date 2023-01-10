@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Notifications\NewEmailVerification;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -83,16 +82,17 @@ class AuthController extends Controller
 		return response()->json(['user' => auth()->user()]);
 	}
 
-	public function update(UpdateUserRequest $request): JsonResponse
+	public function update(Request $request): JsonResponse
 	{
 		$user = auth('sanctum')->user();
 
-		if ($request->image)
+		if ($request->avatar)
 		{
-			$file = $request->file('image');
+			$file = $request->file('avatar');
 			$file_name = time() . '.' . $file->getClientOriginalName();
 			$file->move(public_path('storage/avatars'), $file_name);
-			$user->update(['avatar' => 'storage/avatars/' . $file_name]);
+			$user->avatar = 'storage/avatars/' . $file_name;
+			$user->save();
 		}
 
 		if ($request->email)
