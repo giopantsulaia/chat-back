@@ -17,7 +17,7 @@ return new class extends Migration {
 			$table->foreignId('user_id')->constrained()->cascadeOnDelete();
 			$table->foreignId('recipient_id')->constrained('users')->cascadeOnDelete();
 			$table->string('type');
-			$table->string('state');
+			$table->string('state')->default('unread');
 			$table->timestamps();
 		});
 	}
