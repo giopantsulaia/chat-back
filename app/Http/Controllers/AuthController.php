@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Notifications\NewEmailVerification;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -82,7 +83,7 @@ class AuthController extends Controller
 		return response()->json(['user' => auth()->user()]);
 	}
 
-	public function update(Request $request): JsonResponse
+	public function update(UpdateUserRequest $request): JsonResponse
 	{
 		$user = auth('sanctum')->user();
 
