@@ -14,7 +14,7 @@ return new class extends Migration {
 	{
 		Schema::createMergeView(
 			'friends_view',
-			[(new User())->acceptedFriendsTo(), (new User())->acceptedFriendsFrom()]
+			[(new User())->friendsAcceptedTo(), (new User())->friendsAcceptedFrom()]
 		);
 	}
 
